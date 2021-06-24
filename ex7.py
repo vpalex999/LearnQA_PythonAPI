@@ -26,10 +26,7 @@ methods_name = {"GET": lambda rq, url, data: rq.get(url, params=data),
 
 for req_name, req_method in methods_name.items():
     for send_method in methods_name:
-        if req_name == "GET":
-            response = req_method(requests, api_url, {'method': send_method})
-        else:
-            response = req_method(requests, api_url, {'method': send_method})
+        response = req_method(requests, api_url, {'method': send_method})
 
         print(f"req_method: {req_name}, data: {send_method}, response text: {response.text}, status: {response.status_code}")
 
