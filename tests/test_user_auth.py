@@ -1,14 +1,16 @@
-import requests
 import pytest
+import allure
 
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
+from lib.my_requests import MyRequests
 
 
+@allure.epic("Authorization cases")
 class TestUserAuth(BaseCase):
 
-    api_login = "https://playground.learnqa.ru/api/user/login"
-    api_user_uth = "https://playground.learnqa.ru/api/user/auth"
+    uri_api_login = "/user/login"
+    uri_api_user_uth = "/user/auth"
 
     def setup(self):
         data = {
@@ -16,17 +18,18 @@ class TestUserAuth(BaseCase):
             "password": "1234"
         }
 
-        response1 = requests.post(self.api_login, data=data)
+        response1 = MyRequests.post(self.uri_api_login, data=data)
 
         self.auth_sid = self.get_cookie(response1, "auth_sid")
         self.token = self.get_header(response1, "x-csrf-token")
         self.user_id_auth = self.get_json_value(response1, "user_id")
 
+    @allure.description("This test successfully authorize user by email and password")
     def test_auth_user(self):
 
-        response2 = requests.get(self.api_user_uth,
-                                 headers={"x-csrf-token": self.token},
-                                 cookies={"auth_sid": self.auth_sid})
+        response2 = MyRequests.get(self.uri_api_user_uth,
+                                   headers={"x-csrf-token": self.token},
+                                   cookies={"auth_sid": self.auth_sid})
 
         Assertions.assert_json_value_by_name(
             response2,
@@ -39,15 +42,16 @@ class TestUserAuth(BaseCase):
         ("no_token"),
     ]
 
+    @allure.description("This test checks authorization status w/o sending auth cookie or tocken")
     @pytest.mark.parametrize("condition", exclude_params)
     def test_negative_auth_check(self, condition):
 
         if condition == "no_cookie":
-            response2 = requests.get(self.api_user_uth, headers={
-                                     "x-csrf-token": self.token})
+            response2 = MyRequests.get(self.uri_api_user_uth,
+                                       headers={"x-csrf-token": self.token})
         else:
-            response2 = requests.get(self.api_user_uth, cookies={
-                                     "auth_sid": self.auth_sid})
+            response2 = MyRequests.get(self.uri_api_user_uth,
+                                       cookies={"auth_sid": self.auth_sid})
 
         Assertions.assert_json_value_by_name(
             response2,

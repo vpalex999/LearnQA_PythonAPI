@@ -1,6 +1,7 @@
+import json
+from datetime import datetime
 
 from requests import Response
-import json
 
 
 class BaseCase:
@@ -14,11 +15,30 @@ class BaseCase:
         return response.headers[headers_name]
 
     @staticmethod
-    def get_json_value(response: Response, name):
+    def get_json(response: Response):
         try:
-            response_as_dict = response.json()
+            return response.json()
         except json.decoder.JSONDecodeError:
             assert False, f"Response is not in JSON format. Response text is '{response.text}'"
 
+    @staticmethod
+    def get_json_value(response: Response, name):
+        response_as_dict = BaseCase.get_json(response)
+
         assert name in response_as_dict, f"Response JSON doesn't have key '{name}'"
         return response_as_dict[name]
+
+    def prepare_registration_data(self, email=None):
+        if email is None:
+            base_part = 'learnqa'
+            domain = 'example.com'
+            random_part = datetime.now().strftime("%m%d%Y%H%M%S")
+            email = f"{base_part}{random_part}@{domain}"
+
+        return {
+            'password': "123",
+            'username': 'learnqa',
+            'firstName': 'learnqa',
+            'lastName': 'learnqa',
+            'email': email
+        }
