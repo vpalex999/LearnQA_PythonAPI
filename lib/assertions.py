@@ -28,3 +28,7 @@ class Assertions:
     def assert_code_status(response: Response, expected_status_code):
         assert response.status_code == expected_status_code, \
             f"Unexpected status code! Expected:{expected_status_code}. Actual:{response.status_code}"
+
+    @staticmethod
+    def assert_has_text_in(response: Response, expected_text: str):
+        assert expected_text in response.text, f"Unexpected text! Expected: {expected_text}. Actual: {response.text}"
