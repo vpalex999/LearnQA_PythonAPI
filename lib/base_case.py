@@ -1,4 +1,5 @@
 import json
+import random
 from datetime import datetime
 
 from requests import Response
@@ -32,7 +33,7 @@ class BaseCase:
         if email is None:
             base_part = 'learnqa'
             domain = 'example.com'
-            random_part = datetime.now().strftime("%m%d%Y%H%M%S")
+            random_part = f'{datetime.now().strftime("%m%d%Y%H%M%S")}-{random.randint(100, 10000)}'
             email = f"{base_part}{random_part}@{domain}"
 
         return {

@@ -32,3 +32,42 @@ class TestUserGet(BaseCase):
 
         Assertions.assert_json_has_keys(
             response2, ("username", "email", "firstName", "lastName"))
+
+    def test_get_user_data_with_auth_other_user_id(self):
+        # CREATE TEST USERS
+        data_reg_user1 = self.prepare_registration_data()
+        data_reg_user2 = self.prepare_registration_data()
+
+        response_create_user1 = MyRequests.post('/user/', data=data_reg_user1)
+        Assertions.assert_code_status(response_create_user1, 200)
+
+        response_create_user2 = MyRequests.post('/user/', data=data_reg_user2)
+        Assertions.assert_code_status(response_create_user2, 200)
+
+        # LOGIN
+        response_login_user1 = MyRequests.post("/user/login/",
+                                               data={
+                                                   "email": data_reg_user1["email"],
+                                                   "password": data_reg_user1["password"]
+                                               })
+
+        response_login_user2 = MyRequests.post("/user/login/",
+                                               data={
+                                                   "email": data_reg_user2["email"],
+                                                   "password": data_reg_user2["password"]
+                                               })
+
+        # CHECK GET DATA USER2 USING SID FROM USER1
+        auth_sid_user1 = self.get_cookie(response_login_user1, "auth_sid")
+
+        token_user2 = self.get_header(response_login_user2, "x-csrf-token")
+        user_id_user2 = self.get_json_value(response_login_user2, "user_id")
+
+        response_get_data_user2 = MyRequests.get(f"/user/{user_id_user2}",
+                                                 headers={"x-csrf-token": token_user2},
+                                                 cookies={"auth_sid": auth_sid_user1})
+
+        Assertions.assert_json_has_key(response_get_data_user2, "username")
+        Assertions.assert_json_has_not_key(response_get_data_user2, "email")
+        Assertions.assert_json_has_not_key(response_get_data_user2, "firstName")
+        Assertions.assert_json_has_not_key(response_get_data_user2, "lastName")
