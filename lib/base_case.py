@@ -1,8 +1,11 @@
 import json
 import random
 from datetime import datetime
+from typing import Tuple
 
 from requests import Response
+
+from lib.my_requests import MyRequests
 
 
 class BaseCase:
@@ -43,3 +46,7 @@ class BaseCase:
             'lastName': 'learnqa',
             'email': email
         }
+
+    def create_user_gen(self) -> Tuple[Response, dict]:
+        data = self.prepare_registration_data()
+        return MyRequests.post('/user/', data=data), data

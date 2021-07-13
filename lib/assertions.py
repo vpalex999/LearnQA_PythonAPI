@@ -32,3 +32,8 @@ class Assertions:
     @staticmethod
     def assert_has_text_in(response: Response, expected_text: str):
         assert expected_text in response.text, f"Unexpected text! Expected: {expected_text}. Actual: {response.text}"
+
+    @staticmethod
+    def assert_login_user(response: Response):
+        user_id = BaseCase.get_json_value(response, "user_id")
+        assert user_id != 0, f"User whith id '{user_id}' is not authorize."
