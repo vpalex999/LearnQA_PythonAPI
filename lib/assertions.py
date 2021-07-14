@@ -37,3 +37,13 @@ class Assertions:
     def assert_login_user(response: Response):
         user_id = BaseCase.get_json_value(response, "user_id")
         assert user_id != 0, f"User whith id '{user_id}' is not authorize."
+
+    @staticmethod
+    def assert_create_user(response: Response):
+        Assertions.assert_code_status(response, 200)
+        Assertions.assert_json_has_key(response, 'id')
+
+    @staticmethod
+    def assert_delete_user(response: Response):
+        Assertions.assert_code_status(response, 404)
+        Assertions.assert_has_text_in(response, 'User not found')

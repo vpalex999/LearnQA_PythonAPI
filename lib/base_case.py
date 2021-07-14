@@ -50,3 +50,15 @@ class BaseCase:
     def create_user_gen(self) -> Tuple[Response, dict]:
         data = self.prepare_registration_data()
         return MyRequests.post('/user/', data=data), data
+
+    def get_auth_sid(self, response: Response) -> str:
+        return self.get_cookie(response, "auth_sid")
+
+    def get_x_csrf_token(self, response: Response) -> str:
+        return self.get_header(response, 'x-csrf-token')
+
+    def get_auth_user_id(self, response: Response) -> str:
+        return self.get_json_value(response, 'user_id')
+
+    def get_user_id(self, response: Response) -> str:
+        return self.get_json_value(response, 'id')
