@@ -12,6 +12,7 @@ class TestUserAuth(BaseCase):
     uri_api_login = "/user/login"
     uri_api_user_uth = "/user/auth"
 
+    @allure.step
     def setup(self):
         data = {
             'email': "vinkotov@example.com",
@@ -27,9 +28,10 @@ class TestUserAuth(BaseCase):
     @allure.description("This test successfully authorize user by email and password")
     def test_auth_user(self):
 
-        response2 = MyRequests.get(self.uri_api_user_uth,
-                                   headers={"x-csrf-token": self.token},
-                                   cookies={"auth_sid": self.auth_sid})
+        with allure.step("Login as user"):
+            response2 = MyRequests.get(self.uri_api_user_uth,
+                                       headers={"x-csrf-token": self.token},
+                                       cookies={"auth_sid": self.auth_sid})
 
         Assertions.assert_json_value_by_name(
             response2,
@@ -47,11 +49,13 @@ class TestUserAuth(BaseCase):
     def test_negative_auth_check(self, condition):
 
         if condition == "no_cookie":
-            response2 = MyRequests.get(self.uri_api_user_uth,
-                                       headers={"x-csrf-token": self.token})
+            with allure.step("Try check user auth without cookie"):
+                response2 = MyRequests.get(self.uri_api_user_uth,
+                                           headers={"x-csrf-token": self.token})
         else:
-            response2 = MyRequests.get(self.uri_api_user_uth,
-                                       cookies={"auth_sid": self.auth_sid})
+            with allure.step("Try check user auth without token"):
+                response2 = MyRequests.get(self.uri_api_user_uth,
+                                           cookies={"auth_sid": self.auth_sid})
 
         Assertions.assert_json_value_by_name(
             response2,
